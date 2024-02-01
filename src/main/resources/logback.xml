@@ -1,0 +1,62 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{18}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GELF-UDP" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>graylog</graylogHost>
+        <graylogPort>12201</graylogPort>
+        <maxChunkSize>508</maxChunkSize>
+        <useCompression>true</useCompression>
+        <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+            <originHost>springboot-graylog-app</originHost>
+            <includeRawMessage>false</includeRawMessage>
+            <includeMarker>true</includeMarker>
+            <includeMdcData>true</includeMdcData>
+            <includeCallerData>true</includeCallerData>
+            <includeRootCauseData>true</includeRootCauseData>
+            <includeLevelName>true</includeLevelName>
+            <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{18}) - %msg%n</pattern>
+            </fullPatternLayout>
+            <staticField>app_name:springboot-graylog-app</staticField>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC GELF" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="GELF-UDP" />
+        <neverBlock>true</neverBlock>
+    </appender>
+
+
+    <!-- normal logging -->
+    <logger name="com" level="INFO"/>
+    <logger name="io" level="INFO"/>
+    <logger name="org" level="INFO"/>
+    <logger name="org.spring" level="INFO"/>
+    <logger name="kafka" level="INFO"/>
+    <logger name="state" level="INFO"/>
+    <logger name="kafka.coordinator.group.GroupCoordinator" level="INFO"/>
+    <logger name="wiremock" level="INFO"/>
+    <logger name="demo" level="DEBUG"/>
+
+    <!-- sparse logging -->
+<!--    <logger name="com" level="WARN"/>-->
+<!--    <logger name="io" level="WARN"/>-->
+<!--    <logger name="org" level="WARN"/>-->
+<!--    <logger name="org.spring" level="INFO"/>-->
+<!--    <logger name="kafka" level="WARN"/>-->
+<!--    <logger name="state" level="WARN"/>-->
+<!--    <logger name="kafka.coordinator.group.GroupCoordinator" level="WARN"/>-->
+<!--    <logger name="wiremock" level="WARN"/>-->
+<!--    <logger name="demo" level="INFO"/>-->
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ASYNC GELF" />
+    </root>
+
+</configuration>

@@ -1,0 +1,12 @@
+spring:
+    application:
+        name: kafka-demo
+
+server:
+    port: 9001
+
+kafka:
+    bootstrap-servers: kafka:29092
+
+kafkademo:
+    outboundTopic : "demo-outbound-topic"

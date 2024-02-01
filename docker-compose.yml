@@ -1,0 +1,87 @@
+services:
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.3.2
+        hostname: zookeeper
+        container_name: zookeeper
+        ports:
+            - "2181:2181"
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+
+    kafka:
+        image: confluentinc/cp-kafka:7.3.2
+        hostname: kafka
+        container_name: kafka
+        depends_on:
+            - zookeeper
+        ports:
+            - "9092:9092"
+        volumes:
+            - /var/lib/kafka/data:/kafka-logs
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+    mongodb:
+        image: mongo:5.0.13
+        hostname: mongodb
+        container_name: mongodb
+
+    graylog:
+        image: graylog/graylog:5.2.3
+        hostname: graylog
+        container_name: graylog
+        environment:
+            GRAYLOG_ROOT_USERNAME: admin
+            GRAYLOG_PASSWORD_SECRET: de5673ec263f99a7ef15c02bc99da340ba1fb62e459039186c62eab75e471edea7add0da892c23a35cc0c899cb7446b7
+            GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+            GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+            GRAYLOG_HTTP_EXTERNAL_URI: http://127.0.0.1:9000/
+            GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+        entrypoint: /usr/bin/tini -- /docker-entrypoint.sh
+        depends_on:
+            mongodb:
+                condition: "service_started"
+        ports:
+            # Graylog UI
+            - 9000:9000
+            # GELF TCP
+            - 12201:12201
+            # GELF UDP
+            - 12201:12201/udp
+
+    graylog-datanode:
+        image: graylog/graylog-datanode:5.2.3
+        hostname: graylog-datanode
+        container_name: graylog-datanode
+        environment:
+            GRAYLOG_DATANODE_NODE_ID_FILE: /var/lib/graylog-datanode/node-id
+            GRAYLOG_DATANODE_PASSWORD_SECRET: de5673ec263f99a7ef15c02bc99da340ba1fb62e459039186c62eab75e471edea7add0da892c23a35cc0c899cb7446b7
+            GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+            GRAYLOG_DATANODE_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+        ulimits:
+            memlock:
+                hard: -1
+                soft: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        ports:
+            - "8999:8999/tcp"
+            - "9200:9200/tcp"
+            - "9300:9300/tcp"
+
+    springboot-graylog-app:
+        image: springboot-graylog-app:latest
+        hostname: springboot-graylog-app
+        container_name: springboot-graylog-app
+        depends_on:
+            - kafka
+            - graylog
+        ports:
+            - '9001:9001'
