@@ -9,8 +9,8 @@
 		<relativePath/>
 	</parent>
 	<groupId>demo</groupId>
-	<artifactId>kafka-graylog</artifactId>
-	<version>2.1.0</version>
+	<artifactId>springboot-graylog</artifactId>
+	<version>1.0.0</version>
 	<name>springboot-graylog</name>
 	<description>Demo Spring Boot application with logging piped to Graylog</description>
 	<properties>
