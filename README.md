@@ -1,6 +1,6 @@
 # Spring Boot Demo With Graylog
 
-A Spring Boot application that consumes and produces messages from Kafka, generating logging as it does so.  This logging is piped through to Graylog where messages can be searched and filtered.  Alerts can be configured to notify targets such as Slack, for example when error messages are received.
+A Spring Boot application with a REST API that when called will log a messages.  This logging is piped through to Graylog where messages can be searched and filtered.  Alerts can be configured to notify targets such as Slack, for example when error messages are received.
 
 ## Build Application
 
@@ -14,7 +14,7 @@ This image will be used when the docker containers are started in the next step.
 
 ## Start Docker Containers
 
-From root dir run the following to start dockerised Graylog, Graylog datanode (Opensearch), MongoDB, Kafka, Zookeeper and the Spring Boot application (`springboot-graylog-app`):
+From root dir run the following to start dockerised Graylog, Graylog datanode (Opensearch), MongoDB, and the Spring Boot application (`springboot-graylog-app`):
 ```
 docker-compose up -d
 ```
@@ -65,6 +65,8 @@ Create Input:  `System` / `Inputs` / `Select input` Select `GELF UDP` (in line w
 
 View messages:  `Search`.
 
+To display the logging level, select `FIELDS` on the left menu / `level_name` / `Add to all tables`
+
 ### Graylog Alerting
 
 Configure a Slack webhook endpoint for the Slack workspace that will be sent alert notifications by Graylog:
@@ -73,50 +75,24 @@ https://api.slack.com/messaging/webhooks
 
 Create a `Notification`:  `Alerts` / `Notifications` / `Create notification` / Notification Type: `Slack Notification` / `Webhook URL`: Enter generated URL / `Channel`: Required Slack channel / `Create notification`
 
-Create an `Event Definition`: `Alerts` / `Event Definitions` / `Create event definition` / `Condition type`: `Filter & Aggregation` / `Search query`: `error_level < 4` / `Notifications` / `Add Notification`: Select created notification / `Create event definition`
+Create an `Event Definition`: `Alerts` / `Event Definitions` / `Create event definition` / `Condition type`: `Filter & Aggregation` / `Search query`: `level: <4` / `Notifications` / `Add Notification`: Select created notification / `Create event definition`
 
 ## Generate Application Logging
 
-### Produce Kafka Inbound Event:
-
-Produce a Kafka event to the inbound topic that results in application logging which can be observed in Graylog.
-
-Jump onto the Kafka docker container and produce a `demo-inbound-topic` message:
+Trigger an INFO message by calling:
 ```
-docker exec -ti kafka kafka-console-producer \
---topic demo-inbound-topic \
---broker-list kafka:29092
-```
-Now enter the message:
-```
-{"data": "my-data"}
-```
-The `demo-inbound-topic` message is consumed by the application, which emits a resulting `demo-outbound-topic` message.
-
-### Consume Kafka Outbound Event:
-
-Check for the emitted `demo-outbound-topic` message:
-```
-docker exec -ti kafka kafka-console-consumer \
---topic demo-outbound-topic \
---bootstrap-server kafka:29092 \
---from-beginning
-```
-Output:
-```
-{"data":"Processed: my-data"}
+curl http://localhost:9001/v1/demo/success
 ```
 
 View resultant application logging in Graylog.
 
+<img src="graylog-search.png" alt="Graylog Search" width="800"/>
+
 ## Trigger Alert
 
-The application will log an ERROR message when it receives a message that it cannot unmarshal.
-
-Using the `kafka-console-producer` command above, enter a message that is not in JSON.  An error is logged:
+Trigger an ERROR message by calling:
 ```
-ERROR o.s.k.l.DefaultErrorHandler - Backoff FixedBackOff{interval=0, currentAttempts=1, maxAttempts=0} exhausted for demo-inbound-topic-0@1
-2024-02-01 14:28:26 org.springframework.kafka.listener.ListenerExecutionFailedException: Listener failed
+curl http://localhost:9001/v1/demo/error
 ```
 
 This results in an alert notification being sent to Slack. 

@@ -31,28 +31,11 @@
         <neverBlock>true</neverBlock>
     </appender>
 
-
-    <!-- normal logging -->
     <logger name="com" level="INFO"/>
     <logger name="io" level="INFO"/>
     <logger name="org" level="INFO"/>
     <logger name="org.spring" level="INFO"/>
-    <logger name="kafka" level="INFO"/>
-    <logger name="state" level="INFO"/>
-    <logger name="kafka.coordinator.group.GroupCoordinator" level="INFO"/>
-    <logger name="wiremock" level="INFO"/>
     <logger name="demo" level="DEBUG"/>
-
-    <!-- sparse logging -->
-<!--    <logger name="com" level="WARN"/>-->
-<!--    <logger name="io" level="WARN"/>-->
-<!--    <logger name="org" level="WARN"/>-->
-<!--    <logger name="org.spring" level="INFO"/>-->
-<!--    <logger name="kafka" level="WARN"/>-->
-<!--    <logger name="state" level="WARN"/>-->
-<!--    <logger name="kafka.coordinator.group.GroupCoordinator" level="WARN"/>-->
-<!--    <logger name="wiremock" level="WARN"/>-->
-<!--    <logger name="demo" level="INFO"/>-->
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
