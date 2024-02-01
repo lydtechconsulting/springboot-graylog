@@ -4,7 +4,7 @@ A Spring Boot application that consumes and produces messages from Kafka, genera
 
 ## Build Application
 
-The Spring Boot application docker image should be built with Java 17:
+The Spring Boot application and docker image are built:
 ```
 mvn clean install
 docker build -t springboot-graylog-app .
