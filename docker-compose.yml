@@ -31,6 +31,8 @@ services:
         image: mongo:5.0.13
         hostname: mongodb
         container_name: mongodb
+        volumes:
+            - 'mongodb-data:/data/db'
 
     graylog:
         image: graylog/graylog:5.2.3
@@ -45,8 +47,8 @@ services:
             GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
         entrypoint: /usr/bin/tini -- /docker-entrypoint.sh
         depends_on:
-            mongodb:
-                condition: "service_started"
+            - mongodb
+            - graylog-datanode
         ports:
             # Graylog UI
             - 9000:9000
@@ -54,6 +56,10 @@ services:
             - 12201:12201
             # GELF UDP
             - 12201:12201/udp
+        volumes:
+            - 'graylog-data:/usr/share/graylog/data'
+            - 'graylog-journal:/usr/share/graylog/data/journal'
+        restart: "on-failure"
 
     graylog-datanode:
         image: graylog/graylog-datanode:5.2.3
@@ -75,6 +81,8 @@ services:
             - "8999:8999/tcp"
             - "9200:9200/tcp"
             - "9300:9300/tcp"
+        volumes:
+            - 'graylog-datanode:/var/lib/graylog-datanode'
 
     springboot-graylog-app:
         image: springboot-graylog-app:latest
@@ -85,3 +93,9 @@ services:
             - graylog
         ports:
             - '9001:9001'
+
+volumes:
+    graylog-data: {}
+    graylog-journal: {}
+    graylog-datanode: {}
+    mongodb-data: {}
