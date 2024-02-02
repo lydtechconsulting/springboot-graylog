@@ -6,11 +6,9 @@
         </encoder>
     </appender>
 
-    <appender name="GELF-UDP" class="de.siegmar.logbackgelf.GelfUdpAppender">
+    <appender name="GELF-TCP" class="de.siegmar.logbackgelf.GelfTcpAppender">
         <graylogHost>graylog</graylogHost>
         <graylogPort>12201</graylogPort>
-        <maxChunkSize>508</maxChunkSize>
-        <useCompression>true</useCompression>
         <encoder class="de.siegmar.logbackgelf.GelfEncoder">
             <originHost>springboot-graylog-app</originHost>
             <includeRawMessage>false</includeRawMessage>
@@ -22,12 +20,12 @@
             <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
                 <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{18}) - %msg%n</pattern>
             </fullPatternLayout>
-            <staticField>app_name:springboot-graylog-app</staticField>
+            <staticField>application:springboot-graylog-app</staticField>
         </encoder>
     </appender>
 
-    <appender name="ASYNC GELF" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="GELF-UDP" />
+    <appender name="ASYNC-GELF" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="GELF-TCP" />
         <neverBlock>true</neverBlock>
     </appender>
 
@@ -39,7 +37,7 @@
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="ASYNC GELF" />
+        <appender-ref ref="ASYNC-GELF" />
     </root>
 
 </configuration>
