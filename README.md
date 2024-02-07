@@ -71,7 +71,7 @@ Now login with `admin` / `admin`.
 
 ### Graylog Input Configuration
 
-Create Input:  `System` / `Inputs` / `Select input` Select `GELF UDP` (in line with the appender defined in the `logback.xml` appender) / `Launch new input` /  Enter name / Select `Global` checkbox / `Launch Input`.
+Create Input:  `System` / `Inputs` / `Select input` - select `GELF TCP` (in line with the appender defined in the `logback.xml` appender) / `Launch new input` /  Enter name / Select `Global` checkbox / `Launch Input`.
 
 ### Graylog Log Search
 
