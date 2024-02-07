@@ -118,6 +118,11 @@ Stop containers:
 docker-compose stop
 ```
 
+To delete the volumes created (so the containers start afresh upon restart with no data):
+```
+docker volume rm graylog-data graylog-journal graylog-datanode mongodb-data
+```
+
 Manual clean up:
 ```
 docker rm -f $(docker ps -aq)
