@@ -120,7 +120,7 @@ docker-compose stop
 
 To delete the volumes created (so the containers start afresh upon restart with no data):
 ```
-docker volume rm graylog-data graylog-journal graylog-datanode mongodb-data
+docker volume rm springboot-graylog_graylog-data springboot-graylog_graylog-journal springboot-graylog_graylog-datanode springboot-graylog_mongodb-data
 ```
 
 Manual clean up:
